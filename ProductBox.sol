@@ -20,6 +20,10 @@ contract ProductBox {
         _;
     }
 
+    function getProductLength() external view returns (uint) {
+        return products.length;
+    }
+
     function addProduct(string _n, string _d, uint _p, uint _q) public {
         uint _id = products.push(Product(_n, _d, _p, uint32(_q)));
         productToSeller[_id-1] = msg.sender;
