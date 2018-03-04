@@ -250,10 +250,9 @@ $(function () {  // equivalent to $(document).ready(...)
 	});
 
 	market.getProductLength(function(err, res){
-		for(var i = 0; i < res.toNumber(); i++){
+		for(let i = 0; i < res.toNumber(); i++){
 			market.products(i, function(err, res){
 				market.productToSeller(i, function(err1, res1){
-					console.log(res1);
 					addProduct(res[0], res[1], res[2].toNumber(), res[3].toNumber(), res1);
 				})
 			});
