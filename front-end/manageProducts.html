@@ -48,6 +48,7 @@
         </div>
       </div>
     </nav>
+
     <!-- Page Content -->
     <div class="container">
 
@@ -67,6 +68,33 @@
               
             </div>
           </div>
+          <br/>
+          <div class="card" style="">
+            <div class="card-body">
+              <h5 class="card-title">Add Product</h5>
+              <p class="card-text" id="account_text">Add a product to your shop!</p>
+              
+                <div class="form-group">
+                  <label for="title">Product Title</label>
+                  <input type="text" class="form-control" id="title" placeholder="Insert a title">
+                </div>
+                <div class="form-group">
+                  <label for="description">Product Title</label>
+                  <input type="text" class="form-control" id="description" placeholder="Insert a description">
+                </div>
+                <div class="form-group">
+                  <label for="price">Product Price (in wei)</label>
+                  <input type="text" class="form-control" id="price" placeholder="Insert a price, in wei">
+                </div>
+                <div class="form-group">
+                  <label for="quantity">Product quantity</label>
+                  <input type="text" class="form-control" id="quantity" placeholder="Insert a quantity avaiable to sell">
+                </div>
+              <button id="createProduct" href="#" onclick="createProduct();" class="btn btn-primary">Add product</button>
+              
+            </div>
+          </div>
+          <br/>
 
         </div>
         <!-- /.col-lg-3 -->
@@ -99,8 +127,8 @@
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="js/web3.js"></script>
-     <script src="js/contract.js"></script>
-    <script src="js/ethereum.js"></script>
+    <script src="js/contract.js"></script>
+    <script src="js/manageProducts.js"></script>
 
     <!-- Product Detail Modal -->
     <div class="modal fade" id="productModal">

@@ -24,10 +24,11 @@ contract ProductBox {
         return products.length;
     }
 
-    function addProduct(string _n, string _d, uint _p, uint _q) public {
+    function addProduct(string _n, string _d, uint _p, uint _q) public returns( uint )  {
         uint _id = products.push(Product(_n, _d, _p, uint32(_q)));
         productToSeller[_id-1] = msg.sender;
         sellerProductCounter[msg.sender] = sellerProductCounter[msg.sender].add(1);
+        return _id-1;
     }
 
     function removeProduct(uint _productId) public onlyProductOwner(_productId) {

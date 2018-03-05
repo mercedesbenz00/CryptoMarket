@@ -11,8 +11,31 @@ function showProductModal(id){
 		})
 	});
 }
+
+function deleteProduct(id){
+	market.removeProduct(id, function(err, res){
+		console.log(res);
+		$("#id"+id).remove();
+	});
+
+}
+
+function createProduct(){
+	var title = $("#title").val();
+	var description = $("#description").val();
+	var price = $("#price").val();
+	var quantity = $("#quantity").val();
+	market.addProduct(title, description, price, quantity, function(err, res){
+		if(err == null){
+			console.log(res);
+			// TODO: How to retrive the returned value?
+			addProduct(res, title, description, price, quantity, "NULL");
+		}
+	})
+}
+
 function addProduct(id, name, description, price, quantity, sellerAddress){
-	var card = $(`<div class="col-lg-4 col-md-6 mb-4">
+	var card = $(`<div class="col-lg-4 col-md-6 mb-4" id="id`+id+`">
               <div class="card h-100">
                 <div class="card-body">
                   <h4 class="card-title">
@@ -24,7 +47,7 @@ function addProduct(id, name, description, price, quantity, sellerAddress){
                   <p class="card-text">Product Id: <span class="pid"></span></p>
                 </div>
                 <div class="card-footer">
-                  <p class="seller">Seller: </p>
+                  <button class="btn btn-danger" onclick="deleteProduct(`+id+`);">Delete Product</button>
                 </div>
               </div>
             </div>
@@ -34,7 +57,6 @@ function addProduct(id, name, description, price, quantity, sellerAddress){
     card.find(".description").append(description);
     card.find(".price").append(price);
     card.find(".quantity").append(quantity);
-    card.find(".seller").append(sellerAddress);
     card.find(".pid").append(id);
     $("#row1").append(card);
 }
@@ -57,12 +79,11 @@ $(function () {  // equivalent to $(document).ready(...)
 		$("#balance").append(res.toNumber()/1000000000000000000);
 	});
 
-	market.getProductLength(function(err, res){
-		for(let i = 0; i < res.toNumber(); i++){
-			market.products(i, function(err, res){
-				market.productToSeller(i, function(err1, res1){
-					addProduct(i, res[0], res[1], res[2].toNumber(), res[3].toNumber(), res1);
-				})
+	market.getProductIdsBySeller(coinbase, function(err, res){
+		console.log(res);
+		for(let i = 0; i < res.length; i++){
+			market.products(res[i].toNumber(), function(err, res1){
+					addProduct(res[i].toNumber(), res1[0], res1[1], res1[2].toNumber(), res1[3].toNumber());
 			});
 		}
 	});
