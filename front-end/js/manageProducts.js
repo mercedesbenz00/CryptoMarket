@@ -14,8 +14,7 @@ function showProductModal(id){
 
 function deleteProduct(id){
 	market.removeProduct(id, function(err, res){
-		console.log(res);
-		$("#id"+id).remove();
+		$("#id"+id).hide('slow', function(){ $("#id"+id).remove(); });;
 	});
 
 }
@@ -27,14 +26,31 @@ function createProduct(){
 	var quantity = $("#quantity").val();
 	market.addProduct(title, description, price, quantity, function(err, res){
 		if(err == null){
-			console.log(res);
 			// TODO: How to retrive the returned value?
-			addProduct(res, title, description, price, quantity, "NULL");
+			var card = $(`<div class="col-lg-4 col-md-6 mb-4" id="loadingCard">
+	              <div class="card h-100">
+	                <div class="card-body">
+	                  <h4 class="card-title">
+	                    Loading product...
+	                  </h4>
+	                  <img src="http://www.amarassociatestvm.com/assets/img/preloader2.gif"/>
+	                </div>
+	                <div class="card-footer">
+	                <p>Your product is waiting to be written on the blockchain...</p>
+	                </div>
+	              </div>
+	            </div>
+    		`);
+    		$("#row1").append(card);
 		}
 	})
 }
 
 function addProduct(id, name, description, price, quantity, sellerAddress){
+	var loadingCard = $("#loadingCard");
+	if(loadingCard.length){
+		loadingCard.remove();
+	}
 	var card = $(`<div class="col-lg-4 col-md-6 mb-4" id="id`+id+`">
               <div class="card h-100">
                 <div class="card-body">
@@ -72,6 +88,17 @@ $(function () {  // equivalent to $(document).ready(...)
     web3 = new Web3(window.web3.currentProvider);
 
 	market = web3.eth.contract(abi).at(address);
+
+	var newProductCreatedEvt = market.NewProductCreated();
+	newProductCreatedEvt.watch(function(err, res){
+		if (!err){
+			if(res.args.seller == coinbase){
+				market.products(res.args.productId, function(err, res1){
+					addProduct(res.args.productId, res1[0], res1[1], res1[2].toNumber(), res1[3].toNumber(), "USELESS ADDRESS");
+				});
+			}
+		}
+	});
 	var coinbase = web3.eth.coinbase;
 	web3.eth.getBalance(coinbase, function(err, res){
 		var wei = JSON.stringify(res);
@@ -80,14 +107,12 @@ $(function () {  // equivalent to $(document).ready(...)
 	});
 
 	market.getProductIdsBySeller(coinbase, function(err, res){
-		console.log(res);
 		for(let i = 0; i < res.length; i++){
 			market.products(res[i].toNumber(), function(err, res1){
-					addProduct(res[i].toNumber(), res1[0], res1[1], res1[2].toNumber(), res1[3].toNumber());
+					addProduct(res[i].toNumber(), res1[0], res1[1], res1[2].toNumber(), res1[3].toNumber(), coinbase);
 			});
 		}
 	});
-
 
   }   
 });

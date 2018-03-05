@@ -1,5 +1,5 @@
-var address = "0x5615a7b6a862cf7b35a7dcd3d70dcb5161a526c2";
-  var abi = [
+var address = "0x5b2b637302e2b07f8b49c777fc35a932c561c7ae";
+var abi = [
   {
     "constant": false,
     "inputs": [
@@ -21,12 +21,7 @@ var address = "0x5615a7b6a862cf7b35a7dcd3d70dcb5161a526c2";
       }
     ],
     "name": "addProduct",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -209,5 +204,22 @@ var address = "0x5615a7b6a862cf7b35a7dcd3d70dcb5161a526c2";
     "payable": false,
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "productId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NewProductCreated",
+    "type": "event"
   }
 ];
