@@ -40,7 +40,7 @@ contract ProductBox {
         sellerProductCounter[msg.sender] = sellerProductCounter[msg.sender].sub(1);
     }
 
-    function sellProduct(uint _productId, uint _quantity) internal {
+    function removeProductByQuantity(uint _productId, uint _quantity) internal {
         uint32 diff = uint32(products[_productId].quantity - _quantity);
         require(diff >= 0);
         if (diff == 0) {
