@@ -1,3 +1,9 @@
+function ether(x){
+  return web3.fromWei(x, "ether");
+}
+function toWei(x){
+  return web3.toWei(x, "ether");
+}
 
 function showProductModal(id){
 	market.products(id, function(err, res){
@@ -12,11 +18,32 @@ function showProductModal(id){
 	});
 }
 
+function createAnimation(id) {
+	return function(){
+		$("#id"+id).hide('slow', function(){ 
+			$("#id"+id).show('fast', function(){
+				$("#id"+id).html(`
+	              <div class="card h-100">
+	                <div class="card-body">
+	                  <h4 class="card-title">
+	                    Removing product...
+	                  </h4>
+	                  <img src="http://www.amarassociatestvm.com/assets/img/preloader2.gif"/>
+	                </div>
+	                <div class="card-footer">
+	                <p>Your product will be deleted from the blockchain...</p>
+	                </div>
+	              </div>
+    		`
+				); 
+			});
+		});
+	}
+}
 function deleteProduct(id){
 	market.removeProduct(id, function(err, res){
-		$("#id"+id).hide('slow', function(){ $("#id"+id).remove(); });;
+		createAnimation(id)();
 	});
-
 }
 
 function createProduct(){
@@ -94,11 +121,20 @@ $(function () {  // equivalent to $(document).ready(...)
 		if (!err){
 			if(res.args.seller == coinbase){
 				market.products(res.args.productId, function(err, res1){
-					addProduct(res.args.productId, res1[0], res1[1], res1[2].toNumber(), res1[3].toNumber(), "USELESS ADDRESS");
+					addProduct(res.args.productId, res1[0], res1[1], ether(res1[2].toNumber()), res1[3].toNumber(), "USELESS ADDRESS");
 				});
 			}
 		}
 	});
+
+	var ProductRemovedEvt = market.ProductRemoved()
+	ProductRemovedEvt.watch(function(err, res){
+		if($("#id"+res.args.productId).length){
+			var id = res.args.productId;
+			$("#id"+id).hide('slow', function(){ $("#id"+id).remove()});
+		}
+	});
+
 	var coinbase = web3.eth.coinbase;
 	web3.eth.getBalance(coinbase, function(err, res){
 		var wei = JSON.stringify(res);
@@ -109,10 +145,11 @@ $(function () {  // equivalent to $(document).ready(...)
 	market.getProductIdsBySeller(coinbase, function(err, res){
 		for(let i = 0; i < res.length; i++){
 			market.products(res[i].toNumber(), function(err, res1){
-					addProduct(res[i].toNumber(), res1[0], res1[1], res1[2].toNumber(), res1[3].toNumber(), coinbase);
+					addProduct(res[i].toNumber(), res1[0], res1[1], ether(res1[2].toNumber()), res1[3].toNumber(), coinbase);
 			});
 		}
 	});
-
   }   
 });
+
+

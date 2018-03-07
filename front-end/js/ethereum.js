@@ -1,12 +1,25 @@
+function ether(x){
+  return web3.fromWei(x, "ether");
+}
+function toWei(x){
+  return web3.toWei(x, "ether");
+}
 
 function showProductModal(id){
+
 	market.products(id, function(err, res){
 		market.productToSeller(id, function(err1, res1){
+      if($("#confirm").length){
+        $("#confirm").remove();
+      }
+      $("#quantity").val(0);
+      $("#total").html("0");
 			$("#productModal").find("#product_title").html(res[0]);
 			$("#productModal").find("#product_description").html(res[1]);
-			$("#productModal").find("#product_price").html("Price: "+res[2].toNumber()+" ETHER");
+			$("#productModal").find("#product_price").html(ether(res[2].toNumber()));
 			$("#productModal").find("#product_quantity").html("Avaiable: "+res[3].toNumber()+" units");
 			$("#productModal").find("#product_seller").html("Sold by: "+res1);
+      $("#productModal").find("#product_id").html(id);
 			$('#productModal').modal('show');
 		})
 	});
@@ -49,24 +62,46 @@ $(function () {  // equivalent to $(document).ready(...)
     console.log("Found injected web3.");
     web3 = new Web3(window.web3.currentProvider);
 
-	market = web3.eth.contract(abi).at(address);
-	var coinbase = web3.eth.coinbase;
-	web3.eth.getBalance(coinbase, function(err, res){
-		var wei = JSON.stringify(res);
-		//var ether = wei.dividedBy(1000000000000000000);
-		$("#balance").append(res.toNumber()/1000000000000000000);
-	});
+  	market = web3.eth.contract(abi).at(address);
+  	var coinbase = web3.eth.coinbase;
+  	web3.eth.getBalance(coinbase, function(err, res){
+  		var wei = JSON.stringify(res);
+  		//var ether = wei.dividedBy(1000000000000000000);
+  		$("#balance").append(res.toNumber()/1000000000000000000);
+  	});
 
-	market.getProductLength(function(err, res){
-		for(let i = 0; i < res.toNumber(); i++){
-			market.products(i, function(err, res){
-				market.productToSeller(i, function(err1, res1){
-					addProduct(i, res[0], res[1], res[2].toNumber(), res[3].toNumber(), res1);
-				})
-			});
-		}
-	});
+  	market.getProductLength(function(err, res){
+  		for(let i = 0; i < res.toNumber(); i++){
+  			market.products(i, function(err, res){
+  				market.productToSeller(i, function(err1, res1){
+  					addProduct(i, res[0], res[1], ether(res[2].toNumber()), res[3].toNumber(), res1);
+  				})
+  			});
+  		}
+  	});
 
-
+    
   }   
+});
+
+$("#quantity").on("keyup", function(){
+  var product_price = $("#product_price").text();
+  var total = (product_price * $("#quantity").val());
+  $("#total").html(web3.toWei(total, "ether"));
+});
+
+$("#buyProductBtn").on("click", function(){
+  var confirm = $('<button type="button" class="btn btn-success" id="confirm" >Confirm your order!</button>')
+  confirm.appendTo($("#modal-body"));
+  confirm.on("click", function(){
+    market.buyProduct(
+        $("#productModal").find("#product_id").text(),
+        $("#quantity").val(),
+        $("#shippingAddress").val(),
+        {from: web3.eth.coinbase.value, value: $("#total").html()},
+        function(err, succ){
+          $('#productModal').modal('hide');
+        }
+      )
+  })
 });

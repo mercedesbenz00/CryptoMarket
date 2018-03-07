@@ -16,6 +16,8 @@ contract ProductBox {
     mapping(address => uint32) public sellerProductCounter;
 
     event NewProductCreated(address seller, uint productId);
+    event ProductRemoved(uint productId);
+    event ProductTerminatedAndRemoved(uint productId);
 
     modifier onlyProductOwner(uint _productId){
         require(productToSeller[_productId] == msg.sender);
@@ -38,6 +40,7 @@ contract ProductBox {
         productToSeller[_productId] = productToSeller[products.length - 1];
         products.length = products.length - 1;
         sellerProductCounter[msg.sender] = sellerProductCounter[msg.sender].sub(1);
+        ProductRemoved(_productId);
     }
 
     function removeProductByQuantity(uint _productId, uint _quantity) internal {
@@ -47,6 +50,7 @@ contract ProductBox {
             products[_productId] = products[products.length - 1];
             productToSeller[_productId] = productToSeller[products.length - 1];
             products.length = products.length - 1;
+            ProductTerminatedAndRemoved(_productId);
         } else {
             products[_productId].quantity = diff;
         }
